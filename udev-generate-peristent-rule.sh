@@ -40,16 +40,17 @@ $prj: udev persistent rule generator
 
 Usage: $prj [OPTION] ...
 
-       -h                show this help
-       -m                generate the persistent rule based on interface MAC address
-                         (default option, if nothing is specified)
-       -p                generate the persistent rule based on interface PCI slot
-       -v                be verbose
-       -c [INTERFACE]    current interface name (ex: ip link)
-                         (only needed for retrieving information)
-       -n [INTERFACE]    new interface name (ex: net0)
-       -o [FILE]         where to write the new generate rule (default: /dev/stdout)
-                         prefered location is /etc/udev/rules.d/70-persistent-net.rules
+       -h              show this help
+       -l              list available interfaces
+       -m              generate the persistent rule based on interface MAC address
+                       (default option, if nothing is specified)
+       -p              generate the persistent rule based on interface PCI slot
+       -v              be verbose
+       -c [INTERFACE]  current interface name (ex: ip link)
+                       (only needed for retrieving information)
+       -n [INTERFACE]  new interface name (ex: net0)
+       -o [FILE]       where to write the new generate rule (default: /dev/stdout)
+                       prefered location is /etc/udev/rules.d/70-persistent-net.rules
 
 Example:
        $prj -v -c enp0s4 -n lan0
@@ -261,20 +262,49 @@ ATTR{dev_id}==\"$_dev_id\", ATTR{type}==\"$_dev_type\", KERNEL==\"$_kernel\", NA
   fi
 }
 
+list_adapters()
+{
+  declare -a netdev
+  local count=0
+  local _netdev=""
+  local _dev=""
+
+  for _dev in $SYSPATH/*; do
+      if [ -L "$_dev/device" ]; then
+         _dev="$(basename $_dev 2>/dev/null)"
+         netdev[$count]="$_dev"
+         count=$((count + 1))
+      fi
+  done
+
+  echo "Available interfaces: ${netdev[*]}"
+  for _netdev in "${netdev[@]}"; do
+     _macaddr="$(get_macaddr $SYSPATH/$_netdev)"
+     _pcislot="$(get_pci $SYSPATH/$_netdev)"
+     echo "I: INTERFACE: $_netdev"
+     echo "I: MACADDR: $_macaddr"
+     echo "I: PCI: $_pcislot"
+  done
+}
+
 if [ $# -eq 0 ]; then
    usage
    log_error "missing option(s)."
    exit 1
 fi
 
+SYSPATH="/sys/class/net"
+
 use_mac=0
 use_pci=0
 use_verbose=0
 
-while getopts "hmpvc:n:o:" opt; do
+while getopts "hlmpvc:n:o:" opt; do
   case "$opt" in
      h)
        usage; exit 0;;
+     l)
+       list_adapters; exit 0;;
      m)
        use_mac=1 ;;
      p)
@@ -340,7 +370,7 @@ elif [ "$new_interface" == "lo" ]; then
 fi
 [ "$use_verbose" -eq 1 ] && echo "I: INTERFACE_NEW=$new_interface"
 
-path="/sys/class/net/$interface"
+path="$SYSPATH/$interface"
 if [ ! -d "$path" ]; then
    log_error "devpath $path not a directory."
    exit 1
