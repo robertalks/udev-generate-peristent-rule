@@ -277,7 +277,7 @@ list_adapters()
       fi
   done
 
-  echo "Available interfaces: ${netdev[*]}"
+  echo "Found $count network interfaces:"
   for _netdev in "${netdev[@]}"; do
      _macaddr="$(get_macaddr $SYSPATH/$_netdev)"
      _pcislot="$(get_pci $SYSPATH/$_netdev)"
