@@ -267,7 +267,7 @@ if [ $# -eq 0 ]; then
    exit 1
 fi
 
-use_mac=1
+use_mac=0
 use_pci=0
 use_verbose=0
 
@@ -291,6 +291,10 @@ while getopts "hmpvc:n:o:" opt; do
        exit 1 ;;
   esac
 done
+
+if [[ "$use_mac" -eq 0 ]] && [[ "$use_pci" -eq 0 ]]; then
+   use_mac=1
+fi
 
 if [[ "$use_mac" -eq 1 ]] && [[ "$use_pci" -eq 1 ]]; then
    log_error "generating a persistent rule can be done only using one of the option, -m or -p, not both."
