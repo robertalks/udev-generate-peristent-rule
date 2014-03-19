@@ -42,14 +42,18 @@ Usage: $prj [OPTION] ...
 
        -h                show this help
        -m                generate the persistent rule based on interface MAC address
+                         (default option, if nothing is specified)
        -p                generate the persistent rule based on interface PCI slot
        -v                be verbose
-       -c [INTERFACE]    current interface name (ex: "ip a s")
+       -c [INTERFACE]    current interface name (ex: ip link)
+                         (only needed for retrieving information)
        -n [INTERFACE]    new interface name (ex: net0)
        -o [FILE]         where to write the new generate rule (default: /dev/stdout)
                          prefered location is /etc/udev/rules.d/70-persistent-net.rules
 
 Example:
+       $prj -v -c enp0s4 -n lan0
+    or
        $prj -m -c enp0s4 -n net0 -o /etc/udev/rules.d/70-persistent-net.rules
     or
        $prj -p -c wlp3s0 -n wlan0 -o /etc/udev/rules.d/50-mynet.rules
@@ -263,7 +267,7 @@ if [ $# -eq 0 ]; then
    exit 1
 fi
 
-use_mac=0
+use_mac=1
 use_pci=0
 use_verbose=0
 
