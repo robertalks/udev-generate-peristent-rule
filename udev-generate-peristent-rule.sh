@@ -251,11 +251,9 @@ generate_rule()
   if [ "$_mac" != "none" ]; then
      echo "SUBSYSTEM==\"$_subsystem\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"$_mac\", \
 ATTR{dev_id}==\"$_dev_id\", ATTR{type}==\"$_dev_type\", KERNEL==\"$_kernel\", NAME=\"$_interface\"" >> ${output}
-     [ "$output" != "/dev/stdout" ] && echo >> ${output}
   elif [ "$_pci" != "none" ]; then
      echo "SUBSYSTEM==\"$_subsystem\", ACTION==\"add\", DRIVERS==\"?*\", KERNELS==\"$_pci\", \
 ATTR{dev_id}==\"$_dev_id\", ATTR{type}==\"$_dev_type\", KERNEL==\"$_kernel\", NAME=\"$_interface\"" >> ${output}
-     [ "$output" != "/dev/stdout" ] && echo >> ${output}
   else
      log_error "MAC address or PCI slot information missing."
      exit 1
