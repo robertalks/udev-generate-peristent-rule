@@ -19,7 +19,9 @@
 # a given network interface to rename it to new interface name.
 #
 
-prj="$(basename $0 2>/dev/null)"
+_prj="$(basename $0 2>/dev/null)"
+prj="${_prj%.*}"
+ver="0.2"
 
 log_info()
 {
@@ -36,20 +38,21 @@ log_error()
 usage()
 {
   cat << EOF
-$prj: udev persistent rule generator
+$prj: udev persistent rule generator script
 
 Usage: $prj [OPTION] ...
 
-       -h              show this help
-       -l              list available interfaces
-       -m              generate the persistent rule based on interface MAC address
-                       (default option, if nothing is specified)
-       -p              generate the persistent rule based on interface PCI slot
-       -v              be verbose
-       -c [INTERFACE]  current interface name (ex: ip link)
-                       (only needed for retrieving information)
-       -n [INTERFACE]  new interface name (ex: net0)
-       -o [FILE]       where to write the new generate rule (default: /dev/stdout)
+       -h              Show this help
+       -l              List available interfaces
+       -m              Generate the persistent rule based on interface MAC address
+                       default option, if nothing is specified
+       -p              Generate the persistent rule based on interface PCI slot
+       -v              Be more verbose
+       -V              Output the version number
+       -c [INTERFACE]  Current interface name (ex: ip link)
+                       only needed for retrieving information
+       -n [INTERFACE]  New interface name (ex: net0)
+       -o [FILE]       Where to write the new generate rule (default: /dev/stdout)
                        prefered location is /etc/udev/rules.d/70-persistent-net.rules
 
 Example:
@@ -297,7 +300,7 @@ use_mac=0
 use_pci=0
 use_verbose=0
 
-while getopts "hlmpvc:n:o:" opt; do
+while getopts "hlmpvVc:n:o:" opt; do
   case "$opt" in
      h)
        usage; exit 0;;
@@ -309,6 +312,8 @@ while getopts "hlmpvc:n:o:" opt; do
        use_pci=1 ;;
      v)
        use_verbose=1 ;;
+     V)
+       echo "$prj $ver"; exit 0;;
      c)
        ifcur="$OPTARG" ;;
      n)
