@@ -192,6 +192,18 @@ valid_mac()
   echo $valid_macaddr
 }
 
+valid_dev_type()
+{
+  local dev_type="$1"
+  
+  case "$dev_type" in
+         [0-32])
+         echo "$dev_type" ;;
+         *)
+         echo "invalid" ;;
+  esac
+}
+
 generate_comment()
 {
   local pci_id="$1"
@@ -272,7 +284,8 @@ list_adapters()
 
   for _dev in $SYSPATH/*; do
       if [ -L "$_dev/device" ]; then
-         if [ "$(cat $_dev/type 2>/dev/null)" == "803" ]; then
+         local _dev_type="$(cat $_dev/type 2>/dev/null)"
+         if [ "$(valid_dev_type $_dev_type)" == "invalid" ]; then
             continue;
          fi
          _dev="$(basename $_dev 2>/dev/null)"
@@ -448,8 +461,8 @@ dev_type="$(get_type $path)"
 if [ -z "$dev_type" ]; then
    log_error "unable to retrieve dev_type for interface $interface."
    exit 1
-elif [ "$dev_type" == "803" ]; then
-   log_info "$interface is type 803 and its a virtual device."
+elif [ "$(valid_dev_type $dev_type)" == "invalid" ]; then
+   log_info "$interface not a supported device."
    exit 1
 fi
 [ "$use_verbose" -eq 1 ] && echo "I: TYPE=$dev_type"
