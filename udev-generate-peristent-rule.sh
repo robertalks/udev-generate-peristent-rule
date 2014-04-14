@@ -272,6 +272,9 @@ list_adapters()
 
   for _dev in $SYSPATH/*; do
       if [ -L "$_dev/device" ]; then
+         if [ "$(cat $_dev/type 2>/dev/null)" == "803" ]; then
+            continue;
+         fi
          _dev="$(basename $_dev 2>/dev/null)"
          netdev[$count]="$_dev"
          count=$((count + 1))
@@ -444,6 +447,9 @@ fi
 dev_type="$(get_type $path)"
 if [ -z "$dev_type" ]; then
    log_error "unable to retrieve dev_type for interface $interface."
+   exit 1
+elif [ "$dev_type" == "803" ]; then
+   log_info "$interface is type 803 and its a virtual device."
    exit 1
 fi
 [ "$use_verbose" -eq 1 ] && echo "I: TYPE=$dev_type"
