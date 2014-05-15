@@ -69,7 +69,7 @@ display_note()
 {
   cat << EOF
 
-NOTE: Using the generate persistent rule might mean you will need to do extra work to ensure
+NOTE: Using the persistent rule generator might mean you will need to do extra work to ensure
 that it will work accordingly. This mean, regenerating the initramfs/initrd image and/or using 
 'net.ifnames=0' option at boot time.
 In openSUSE/SUSE, the user will need to regenerate the initramfs/initrd image, but usually there
@@ -475,7 +475,7 @@ if [ -n "$devtype" ]; then
 fi
 
 if [ -n "$output" ]; then
-   echo "Persistent rule written to "$outfile""
+   echo "Writting persistent rule to "$outfile""
    generate_comment "$pci_id" "$driver" "$outfile" "$parent_subsystem"
 fi
 
