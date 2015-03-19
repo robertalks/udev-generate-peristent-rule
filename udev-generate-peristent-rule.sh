@@ -21,7 +21,7 @@
 
 _prj="$(basename $0 2>/dev/null)"
 prj="${_prj%.*}"
-ver="0.2"
+ver="0.3"
 
 log_info()
 {
@@ -83,8 +83,7 @@ get_pci()
   local pci=""
 
   if [ -L "$path/device" ]; then
-     local pci_link="$(readlink -f $path/device 2>/dev/null)"
-     pci="$(basename $pci_link 2>/dev/null)"
+     pci="$(basename $(readlink -f $path/device 2>/dev/null) 2>/dev/null)"
   fi
   echo $pci
 }
@@ -95,8 +94,8 @@ get_pci_id()
   local pci_id=""
 
   if [ -r "$path/device/uevent" ]; then
-     local _pci_id="$(cat $path/device/uevent|grep ^PCI_ID 2>/dev/null)"
-     pci_id="${_pci_id#*=}"
+     pci_id="$(grep ^PCI_ID $path/device/uevent 2>/dev/null)"
+     pci_id="${pci_id#*=}"
   fi
   echo $pci_id
 }
@@ -139,7 +138,7 @@ get_devtype()
   local path="$1"
   local devtype=""
   if [ -r "$path/uevent" ]; then
-     local _devtype="$(cat $path/uevent|grep ^DEVTYPE 2>/dev/null)"
+     devtype="$(grep ^DEVTYPE $path/uevent 2>/dev/null)"
      devtype="${_devtype#*=}"
   fi
   echo $devtype
@@ -151,8 +150,7 @@ get_subsystem()
   local subsystem=""
 
   if [ -L "$path/subsystem" ]; then
-     local subsystem_link="$(readlink -f $path/subsystem 2>/dev/null)"
-     subsystem="$(basename $subsystem_link 2>/dev/null)"
+     subsystem="$(basename $(readlink -f $path/subsystem 2>/dev/null) 2>/dev/null)"
   fi
   echo $subsystem
 }
@@ -163,8 +161,7 @@ get_parent_subsystem()
   local subsystem=""
 
   if [ -L "$path/device/subsystem" ]; then
-     local subsystem_link="$(readlink -f $path/device/subsystem 2>/dev/null)"
-     subsystem="$(basename $subsystem_link 2>/dev/null)"
+     subsystem="$(basename $(readlink -f $path/device/subsystem 2>/dev/null) 2>/dev/null)"
   fi
   echo $subsystem
 }
@@ -175,8 +172,7 @@ get_driver()
   local driver=""
 
   if [ -L "$path/device/driver" ]; then
-     local driver_link="$(readlink -f $path/device/driver 2>/dev/null)"
-     driver="$(basename $driver_link 2>/dev/null)"
+     driver="$(basename $(readlink -f $path/device/driver 2>/dev/null) 2>/dev/null)"
   fi
   echo $driver
 }
